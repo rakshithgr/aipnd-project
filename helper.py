@@ -104,7 +104,7 @@ def save_model(arch, model, optimizer, input_size, output_size, epochs, drop_p, 
     if save_dir:
         filepath = save_dir + '/' + 'checkpoint_{}.pth'.format("_".join(checkpoint['hidden_layers']))
     else:
-        filepath = 'checkpoint_{}.pth'.format("_".join(checkpoint['hidden_layers']))
+        filepath = 'checkpoint_{}.pth'.format("_".join([str(each.out_features) for each in model.classifier.hidden_layers]))
 
     torch.save(checkpoint, filepath)
 

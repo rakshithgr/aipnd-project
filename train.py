@@ -26,12 +26,10 @@ parser.add_argument('--gpu', action="store_true", default=False, dest="gpu")
 args = parser.parse_args()
 
 
+
 # adding custom classifier to pretrained model
-def add_classifier(model):
-    input_size = 1024
-    output_size = 102
-    hidden_layer = list(map(int, args.hidden_units.strip('[]').split(',')))
-    model.classifier = h.classifier(input_size, output_size, hidden_layer, args.drop_p)
+def add_classifier(model, input_size, output_size, hidden_layer, drop_p):
+    model.classifier = h.classifier(input_size, output_size, hidden_layer, drop_p)
     return model
 
 
@@ -109,9 +107,14 @@ def train(model, optimizer, criterion, trainloader, validloader, epochs, gpu):
 # dataset loading
 trainloader, validloader, testloader, class_to_idx = h.load_data(args.data_dir)
 
+# model hyperparameters
+input_size = 1024
+output_size = 102
+hidden_layer = list(map(int, args.hidden_units.strip('[]').split(',')))
+
 # model selection and adding custom classifier
 model = h.model_selection(args.arch)
-model = add_classifier(model)
+model = add_classifier(model, input_size, output_size, hidden_layer, args.drop_p)
 
 # specifying criterion and optimizer
 criterion = nn.NLLLoss()
