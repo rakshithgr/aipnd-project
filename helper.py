@@ -4,7 +4,7 @@ import seaborn as sb
 import numpy as np
 
 import torch
-from torch import nn
+from torch import nn, optim
 from torch.nn import functional as F
 from torchvision import datasets, transforms, models
 from PIL import Image
@@ -91,9 +91,9 @@ def save_model(arch, model, optimizer, input_size, output_size, epochs, drop_p, 
     checkpoint = {
         'input_size': input_size,
         'output_size': output_size,
-        'hidden_layers': [each.out_features for each in model.classifier.hidden_layers],
+        'hidden_layer_size': [each.out_features for each in model.classifier.hidden_layers],
         'model_state_dict': model.state_dict(),
-        'optimizer_state_dict': optimizer.state_dict(),
+        'optimizer_state': optimizer.state_dict(),
         'class_to_idx': model.class_to_idx,
         'drop_p': drop_p,
         'learning_rate': learning_rate,
@@ -116,7 +116,7 @@ def load_checkpoint(filepath):
 
     model.classifier = classifier(checkpoint['input_size'],
                                  checkpoint['output_size'],
-                                 checkpoint['hidden_layers'],
+                                 checkpoint['hidden_layer_size'],
                                  checkpoint['drop_p'])
 
     model.load_state_dict(checkpoint['model_state_dict'])

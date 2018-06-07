@@ -52,10 +52,9 @@ def validation(model, criterion, dataloader, device):
 
 
 # training model
-def train(model, optimizer, criterion, trainloader, validloader, epochs, gpu):
+def train(model, optimizer, criterion, trainloader, validloader, epochs):
 
     # setting compute device
-    device = "cuda:0" if gpu else "cpu"
     model.to(device)
 
     # training
@@ -111,6 +110,7 @@ trainloader, validloader, testloader, class_to_idx = h.load_data(args.data_dir)
 input_size = 1024
 output_size = 102
 hidden_layer = list(map(int, args.hidden_units.strip('[]').split(',')))
+device = "cuda:0" if args.gpu else "cpu"
 
 # model selection and adding custom classifier
 model = h.model_selection(args.arch)
@@ -121,9 +121,9 @@ criterion = nn.NLLLoss()
 optimizer = optim.Adam(model.classifier.parameters(), lr=args.learning_rate)
 
 # begin training
-train(model, optimizer, criterion, trainloader, validloader, args.epochs, args.gpu)
+train(model, optimizer, criterion, trainloader, validloader, args.epochs)
 
 # print test set accuracy
 tloss, taccuracy = validation(model, criterion, testloader, device)
-print('\n\n\nTest Set Loss: {:.3f}\nTest Set Accuracy: {:.3f}'.format((tloss/len(testloader)),
+print('\nTest Set Loss: {:.3f}\nTest Set Accuracy: {:.3f}\n'.format((tloss/len(testloader)),
                                                                       (taccuracy/len(testloader)*100)))

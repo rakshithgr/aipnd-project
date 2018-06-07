@@ -1,6 +1,11 @@
 import helper as h
 import argparse
 import torch
+import matplotlib.pyplot as plt
+import seaborn as sb
+
+import warnings
+warnings.filterwarnings("ignore")
 
 
 # command line arguments parsing
@@ -19,7 +24,7 @@ def predict(image_path, model, topk):
     model.to(device)
     model.eval()
 
-    imaget = process_image(image_path)
+    imaget = h.process_image(image_path)
     imaget.to(device)
 
     imaget = imaget.unsqueeze(0)
@@ -46,8 +51,8 @@ def sanity_check(image_path):
         names.append(cat_to_name[str(inv_mapping[i])])
 
 
-    imshow(process_image(image_path), ax=plt.subplot(2,1,1));
-    plt.title(cat_to_name['21'])
+    h.imshow(h.process_image(image_path), ax=plt.subplot(2,1,1));
+    plt.title(names[0])
 
     plt.subplot(2,1,2)
     sb.barplot(y=names, x=ps, color=sb.color_palette()[0]);
