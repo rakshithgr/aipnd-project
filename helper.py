@@ -23,9 +23,15 @@ def load_data(data_dir):
                                     transforms.Normalize((0.485, 0.456, 0.406),
                                                         (0.229, 0.224, 0.225))])
 
+    valid_transforms = transforms.Compose([transforms.RandomResizedCrop(224),
+                                     transforms.ToTensor(),
+                                     transforms.Normalize( (0.485, 0.456, 0.406),
+                                                           (0.229, 0.224, 0.225))])
+
+
     train_dataset = datasets.ImageFolder(train_dir, transform=transform)
-    valid_dataset = datasets.ImageFolder(valid_dir, transform=transform)
-    test_dataset = datasets.ImageFolder(test_dir, transform=transform)
+    valid_dataset = datasets.ImageFolder(valid_dir, transform=valid_transforms)
+    test_dataset = datasets.ImageFolder(test_dir, transform=valid_transforms)
 
     class_to_idx = train_dataset.class_to_idx
 
@@ -44,15 +50,19 @@ def label_mapping(filepath):
 
 # model selection
 def model_selection(arch):
-    if arch.lower() == "vgg16":
-        model = models.vgg16(pretrained=True)
-    elif arch.lower() == "vgg19":
-        model = models.vgg19(pretrained=True)
-    elif arch.lower() =="alexnet":
-        model = models.alexnet(pretrained=True)
-    else:
-        model = models.densenet121(pretrained=True)
 
+    # if arch.lower() == "vgg16":
+    #     model = models.vgg16(pretrained=True)
+    # elif arch.lower() == "vgg19":
+    #     model = models.vgg19(pretrained=True)
+    # elif arch.lower() =="alexnet":
+    #     model = models.alexnet(pretrained=True)
+    # else:
+    #     model = models.densenet121(pretrained=True)
+
+    model = getattr(models, arch.lower())(pretrained=True)
+
+    # freezing parameters
     for param in model.parameters():
         param.requires_grad = False
 
@@ -102,7 +112,7 @@ def save_model(arch, model, optimizer, input_size, output_size, epochs, drop_p, 
     }
 
     if save_dir:
-        filepath = save_dir + '/' + 'checkpoint_{}.pth'.format("_".join(checkpoint['hidden_layers']))
+        filepath = save_dir + '/' + 'checkpoint_{}_{}.pth'.format("_".join(checkpoint['hidden_layers']), checkpoint['model'])
     else:
         filepath = 'checkpoint_{}.pth'.format("_".join([str(each.out_features) for each in model.classifier.hidden_layers]))
 

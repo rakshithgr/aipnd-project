@@ -63,7 +63,7 @@ cat_to_name = h.label_mapping('cat_to_name.json')
 
 # loading model from checkpoint
 model, optimizer = h.load_checkpoint(args.checkpoint)
-device = "cuda:0" if args.gpu else "cpu"
+device = "cuda:0" if (args.gpu and torch.cuda.is_available()) else "cpu"
 
 # predicting image
 sanity_check(args.input)

@@ -19,7 +19,7 @@ parser.add_argument('data_dir')
 parser.add_argument('--save_dir', dest="save_dir")
 parser.add_argument('--arch', dest='arch', default='densenet121')
 parser.add_argument('--learning_rate', default=0.001, type=float, dest="learning_rate")
-parser.add_argument('--hidden_units', default=[512], dest="hidden_units")
+parser.add_argument('--hidden_units', default='[512]', dest="hidden_units", type=str)
 parser.add_argument('--epochs', default=30, type=int, dest="epochs")
 parser.add_argument('--drop_p', default=0.5, type=float, dest="drop_p")
 parser.add_argument('--gpu', action="store_true", default=False, dest="gpu")
@@ -106,14 +106,16 @@ def train(model, optimizer, criterion, trainloader, validloader, epochs):
 # dataset loading
 trainloader, validloader, testloader, class_to_idx = h.load_data(args.data_dir)
 
+# model selection
+model = h.model_selection(args.arch)
+
 # model hyperparameters
-input_size = 1024
+input_size = [each.in_features for each in model.classifier.modules() if type(each) == torch.nn.modules.linear.Linear][0]
 output_size = 102
 hidden_layer = list(map(int, args.hidden_units.strip('[]').split(',')))
-device = "cuda:0" if args.gpu else "cpu"
+device = "cuda:0" if (args.gpu and torch.cuda.is_available()) else "cpu"
 
-# model selection and adding custom classifier
-model = h.model_selection(args.arch)
+# adding custom classifier
 model = add_classifier(model, input_size, output_size, hidden_layer, args.drop_p)
 
 # specifying criterion and optimizer
