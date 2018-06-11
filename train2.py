@@ -97,7 +97,7 @@ def train(model, optimizer, criterion, trainloader, validloader, epochs):
                 print('Epoch: {}/{}\t'.format(e+1, epochs),
                       'TLoss: {:.2f}\t'.format(running_loss/print_step),
                       'VLoss: {:.2f}\t'.format(vloss/len(validloader)),
-                      'VAccuracy: {:.2f}'.format(vaccuracy/len(validloader)*100),
+                      'VAccuracy: {:.2f}\t'.format(vaccuracy/len(validloader)*100),
                       'Time: {:.2f}'.format(end-start))
 
                 running_loss = 0
